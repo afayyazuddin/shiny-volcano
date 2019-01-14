@@ -1,0 +1,1 @@
+This is a volcano plot of the Pasilla dataset analyzed with DESeq2. The sliders can be used to set the axis range for adjusted p-values (-log10 transformed) and/or fold-change (log2 transformed). The dotted horizontal line is placed at padj = 0.05. The vertical dotted lines are placed at log2FC = +/- 1.5.
