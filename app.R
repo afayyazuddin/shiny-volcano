@@ -20,10 +20,11 @@ max_fc <- round(max(pasilla_results$log2FoldChange) + 1, 0)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
+
    # Application title
    titlePanel("Volcano"),
-   
+
+   # Add a description and instructions
    fluidRow(
      column(4,
             includeText("include.txt")
@@ -47,31 +48,30 @@ ui <- fluidPage(
 
       # show volcano plot
       mainPanel(
-        plotOutput(outputId = "scatterplot", 
+        plotOutput(outputId = "scatterplot",
                    brush = "plot_brush"),
         # Show data table
         tableOutput(outputId = "resultstable")
       ),
 
-    
+
   )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
+
    output$scatterplot <- renderPlot({
-      
-      # draw the histogram with the specified number of bins
-      #hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    # ggplot(data = movies, aes_string(x = input$x, y = input$y)) +
-    #  geom_point()
-      ggplot(data = pasilla_results, aes(x=log2FoldChange, 
-                                         y= minus_log10_p_value, col = factor(sig), alpha = 0.1)) + 
-        geom_point() + 
+
+      # Draw a volcano plot of the pasilla dataset
+      ggplot(data = pasilla_results, aes(x=log2FoldChange,
+                                         y= minus_log10_p_value, col = factor(sig), alpha = 0.1)) +
+        geom_point() +
+        # add lines to indicate log2FC +/- 1.5
         geom_vline(xintercept=1.5, linetype="dotted") +
         geom_vline(xintercept=-1.5, linetype="dotted") +
-        geom_hline(yintercept=-log(0.05, base=10), linetype="dotted") + 
+        # add line to indicate padj = 0.05
+        geom_hline(yintercept=-log(0.05, base=10), linetype="dotted") +
         theme(legend.position="none") +
         labs(x="log2 Fold Change", y="-log10 adjusted p-value") +
         ylim(input$range_y[1],input$range_y[2]) +
@@ -82,14 +82,10 @@ server <- function(input, output) {
    output$resultstable <- renderTable({
      brushedPoints(pasilla_results, input$plot_brush) %>%
        select(genenames, log2FoldChange, minus_log10_p_value)
-   },  striped = TRUE, spacing = "l", align = "lcr", digits = 2, 
+   },  striped = TRUE, spacing = "l", align = "lcr", digits = 2,
    caption = "Selected points.")
-   # output$brush_info <- renderPrint({
-   #   cat("input$plot_brush:\n")
-   #   str(input$plot_brush)
-   # })
+
 }
 
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
-
